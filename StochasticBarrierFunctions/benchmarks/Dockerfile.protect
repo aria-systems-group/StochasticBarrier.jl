@@ -27,10 +27,11 @@ COPY protect_benchmarks/run_protect.sh /app/PRoTECT/run_protect.sh
 RUN chmod +x /app/PRoTECT/run_protect.sh
 
 # --- Copy Mosek license ---
-RUN mkdir -p /app/PRoTECT/protect_benchmarks/mosek
-COPY protect_benchmarks/mosek/mosek.lic /app/PRoTECT/protect_benchmarks/mosek/mosek.lic
-RUN chmod 644 /app/PRoTECT/protect_benchmarks/mosek/mosek.lic
-ENV MOSEKLM_LICENSE_FILE=/app/PRoTECT/protect_benchmarks/mosek/mosek.lic
+RUN mkdir -p /app/PRoTECT/mosek
+COPY mosek/mosek.lic /app/PRoTECT/mosek/mosek.lic
+RUN chmod 644 /app/PRoTECT/mosek/mosek.lic
+ENV MOSEKLM_LICENSE_FILE=/app/PRoTECT/mosek/mosek.lic
+
 
 # --- Install PRoTECT Python dependencies ---
 RUN pip3 install --no-cache-dir -r /app/PRoTECT/requirements.txt && \
