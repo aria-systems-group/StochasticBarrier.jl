@@ -23,16 +23,6 @@ A total of three experiments are included for benchmarking PWC:
 
 Read the description below for repeatability of all the experiments.
 
-### Mosek License
-All SOS experiments use Mosek as the SDP solver. A valid Mosek license file is therefore required.
-
-# Obtain your license
-Obtain mosek.lic from https://www.mosek.com/
-
-# Paste the license
-Paste the file into the folder
-- StochasticBarrierFunctions/benchmarks/mosek/
-
 ### Docker Image
 The Dockerfile is provided in the main folder. Build this docker file to obtain all the required Julia packages, as specified in the Project.toml. To build the docker image, navigate into the main folder and run the following command 
 ```sh
