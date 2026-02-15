@@ -30,7 +30,7 @@ function [Bxpolys, betaval, gam, Ps] = runSOS2D(deg)
     syms z1 z2 x1 x2 betasym gamsym real
     EXP = 0;
     
-    solver_opt.solver = 'mosek';
+    solver_opt.solver = 'sdpt3';
     fx = [0.95*x1; 0.95*x2];
     
     prog = sosprogram([x1, x2], [betasym, gamsym]);

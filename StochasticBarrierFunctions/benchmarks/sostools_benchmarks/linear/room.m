@@ -31,7 +31,7 @@ function [Bxpolys, betaval, gam, Ps] = runSOS3D(deg)
     syms z1 z2 z3 x1 x2 x3 betasym gamsym real
     EXP = 0;
     
-    solver_opt.solver = 'mosek';
+    solver_opt.solver = 'sdpt3';
     
     % System dynamics
     fx = [0.4 + 0.031*x2 + 0.929*x1;
