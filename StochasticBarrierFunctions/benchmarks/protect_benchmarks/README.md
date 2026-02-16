@@ -9,7 +9,7 @@ sudo docker build -f Dockerfile.protect -t protect-bench .
 To start a container 
 
 ```sh
-sudo docker run -it protect-bench
+sudo docker run --rm -it protect-bench
 ```
 
 ## Run through bash

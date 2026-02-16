@@ -32,7 +32,7 @@ sudo docker build -t stochastic_barrier .
 To start a container 
 
 ```sh
-sudo docker run -it --name StochasticBarrier stochastic_barrier
+sudo docker run -rm -it --name StochasticBarrier stochastic_barrier
 ```
 
 ## Run through bash
