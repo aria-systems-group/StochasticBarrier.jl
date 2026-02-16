@@ -14,10 +14,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # --- Clone PRoTECT repository ---
+# Checkout specific commit for reproducibility
 RUN git clone https://github.com/Kiguli/PRoTECT.git && \
     cd PRoTECT && \
-    git checkout main && \
-    git pull origin main
+    git checkout 7a1f7bb2aeab9931f0b347d2ecc1332df91a63a9
 
 # --- Copy local experiments ---
 COPY protect_benchmarks/experiments/ /app/PRoTECT/experiments/
