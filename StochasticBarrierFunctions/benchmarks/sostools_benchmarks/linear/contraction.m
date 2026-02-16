@@ -30,7 +30,7 @@ function [Bxpolys, betaval, gam, Ps] = runSOS2D(deg)
     syms z1 z2 x1 x2 betasym gamsym real
     EXP = 0;
     
-    solver_opt.solver = 'sdpt3';
+    solver_opt.solver = 'mosek';
     fx = [0.95*x1; 0.95*x2];
     
     prog = sosprogram([x1, x2], [betasym, gamsym]);
@@ -71,11 +71,11 @@ function [Bxpolys, betaval, gam, Ps] = runSOS2D(deg)
     termlist = children(Bsub);
     
     for ii = 1:length(termlist)
-    z1count = 0; z2count = 0; x1count = 0; x2count = 0; EXPz = 0;
-    factored = cell2sym(termlist(ii));
-    factoredterm = factor(factored);
+        z1count = 0; z2count = 0; x1count = 0; x2count = 0; EXPz = 0;
+        factored = cell2sym(termlist(ii));
+        factoredterm = factor(factored);
 
-    for jj = 1:length(factoredterm)
+        for jj = 1:length(factoredterm)
             if isequaln(factoredterm(jj), z1), z1count = z1count + 1; end
             if isequaln(factoredterm(jj), z2), z2count = z2count + 1; end
             if isequaln(factoredterm(jj), x1), x1count = x1count + 1; end
