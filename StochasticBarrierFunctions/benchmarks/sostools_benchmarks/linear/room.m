@@ -1,7 +1,7 @@
 %% SOS 3D Polynomial System
 clc; clear all;
 
-deg_list = [2, 4, 6, 8, 12];
+deg_list = [2, 4, 6, 8];
 results = struct('degree', [], 'Bx', [], 'betaval', [], 'gam', [], 'Ps', [], 'time', []);
 
 for kk = 1:length(deg_list)

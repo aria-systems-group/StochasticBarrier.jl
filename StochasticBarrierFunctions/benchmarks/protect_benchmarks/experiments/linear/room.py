@@ -101,7 +101,7 @@ if __name__ == '__main__':
     }
 
     # ========================= Run for multiple degrees =========================
-    degrees = [2, 4, 6, 8, 12]
+    degrees = [2, 4, 6, 8]
 
     for degree in degrees:
         start = time.time()
