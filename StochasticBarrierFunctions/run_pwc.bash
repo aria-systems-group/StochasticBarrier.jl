@@ -9,7 +9,6 @@ fi
 # -------------------------------
 # Julia SOS and PWC experiments
 # -------------------------------
-JULIA_PROJECT="/StochasticBarrierFunctions"
 echo "Starting Julia SOS vs PWC experiments ..."
 
 julia --project="$JULIA_PROJECT" <<'EOF'

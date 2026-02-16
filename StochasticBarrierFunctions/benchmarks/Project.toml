@@ -1,7 +1,5 @@
-name = "StochasticBarrierFunctions"
-uuid = "a06fe262-dd7d-4c83-aa2f-7afdb1a09a89"
-authors = ["Rayan Mazouz <rayan.mazouz@colorado.edu>", "Frederik Baymler Mathiesen <frederik@baymler.com"]
 version = "0.1.0"
+authors = ["Rayan Mazouz <rayan.mazouz@colorado.edu>", "Frederik Baymler Mathiesen <frederik@baymler.com"]
 
 [deps]
 CDDLib = "3391f64e-dcde-5f30-b752-e11513730f60"
@@ -31,6 +29,7 @@ ReachabilityBase = "379f33d0-9447-4353-bd03-d664070e549f"
 SCS = "c946c3f1-0d1f-5ce8-9dea-7daa1f7e2d13"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+StochasticBarrierFunctions = "a06fe262-dd7d-4c83-aa2f-7afdb1a09a89"
 SumOfSquares = "4b9e565b-77fc-50a5-a571-1244f986bda1"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 YAXArrayBase = "90b8fcef-0c2d-428d-9c56-5f86629e9d14"
@@ -39,3 +38,7 @@ YAXArrays = "c21b50f5-aa40-41ea-b809-c0f5e47bfa5c"
 [compat]
 Distributions = "0.25.112"
 ProgressMeter = "1.10.2"
+julia = "1.11"
+
+[sources]
+StochasticBarrierFunctions = {path = ".."}

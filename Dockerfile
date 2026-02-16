@@ -7,7 +7,8 @@ RUN chmod +x /StochasticBarrierFunctions/run_sos.bash \
 WORKDIR /StochasticBarrierFunctions
 
 # Precompile Julia package
-RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate(); Pkg.precompile()'
+ENV JULIA_PROJECT='/StochasticBarrierFunctions/benchmarks'
+RUN julia --project="$JULIA_PROJECT" -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
 
 # Single alias that dispatches based on argument
 RUN echo 'stochasticbarrier() {' >> ~/.bashrc \

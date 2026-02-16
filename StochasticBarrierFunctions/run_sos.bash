@@ -9,7 +9,6 @@ fi
 # -------------------------------
 # Julia SOS experiments
 # -------------------------------
-JULIA_PROJECT="/StochasticBarrierFunctions"
 echo "Starting Julia SOS experiments ..."
 
 julia --project="$JULIA_PROJECT" <<'EOF'
@@ -52,6 +51,9 @@ yaml_files = [
     "benchmarks/polynomial/systems/oscillator/SOS/sos_deg12.yaml"
 
 ]
+
+using Pkg
+display(Pkg.status())
 
 # Include the barrier synthesis once
 include("benchmarks/barrier_synthesis.jl")
