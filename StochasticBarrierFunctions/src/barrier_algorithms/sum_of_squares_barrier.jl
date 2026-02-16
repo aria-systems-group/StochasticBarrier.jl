@@ -31,7 +31,7 @@ function synthesize_barrier(alg::SumOfSquaresAlgorithm, system, initial_region::
 
         # Create barrier candidate
         @polyvar x[1:dimensionality(system)]
-        barrier_monomials = monomials(x, 0:floor(Int64, alg.barrier_degree / 2))
+        barrier_monomials = ScaledMonomialBasis(monomials(x, 0:floor(Int64, alg.barrier_degree / 2)))
 
         # Non-negative in ℝⁿ
         @variable(model, B, SOSPoly(barrier_monomials))
@@ -76,7 +76,7 @@ function sos_initial_constraint!(alg::SumOfSquaresAlgorithm ,model,B,x ,η ,regi
     """
     for region in regions
         initial_domain = sos_hpoly_lag(alg, model, x, region)
-        @constraint(model, -B + η - initial_domain >= 0)
+        @constraint(model, -B + η - initial_domain >= 0, basis=ScaledMonomialBasis)
     end
 end
 
@@ -90,7 +90,7 @@ function sos_obstacle_constraint!(alg::SumOfSquaresAlgorithm ,model,B,x ,regions
     """
     for region in regions
         obstacle_domain = sos_hpoly_lag(alg, model, x, region)
-        @constraint(model, B - 1 - obstacle_domain >= 0)
+        @constraint(model, B - 1 - obstacle_domain >= 0, basis=ScaledMonomialBasis)
     end
 end
 
@@ -125,7 +125,7 @@ function sos_system_specific_constraints!(alg, model, B, x, β, system::Additive
     exp_domain = sos_hpoly_lag(alg, model, x, system.state_space)
 
     # Add constraint
-    @constraint(model, -exp + B + β - exp_domain >= 0)
+    @constraint(model, -exp + B + β - exp_domain >= 0, basis=ScaledMonomialBasis)
 end
 
 function sos_system_specific_constraints!(alg, model, B, x, β, system::AdditiveGaussianPolySystem)
@@ -146,7 +146,7 @@ function sos_system_specific_constraints!(alg, model, B, x, β, system::Additive
     exp_domain = sos_hpoly_lag(alg, model, x, system.state_space)
 
     # Add constraint
-    @constraint(model, -exp + B + β - exp_domain >= 0)
+    @constraint(model, -exp + B + β - exp_domain >= 0, basis=ScaledMonomialBasis)
 end
 
 function sos_unsafe_constraint!(alg, model, B, x, state_space::AbstractHyperrectangle)
@@ -159,13 +159,13 @@ function sos_unsafe_constraint!(alg, model, B, x, state_space::AbstractHyperrect
     dim_sets = (x - cs).^2 - rs.^2 # (x - cs).^2 >= rs.^2 <=> (x - cs).^2 - rs.^2 >= 0
 
     for (dim_set, x) in zip(dim_sets, x)
-        monos = monomials([x], 0:floor(Int64, alg.lagrange_degree / 2))
+        monos = ScaledMonomialBasis(monomials([x], 0:floor(Int64, alg.lagrange_degree / 2)))
 
         # Lagragian multiplier
         lag_poly = @variable(model, variable_type=SOSPoly(monos))
         domain = lag_poly * dim_set
 
-        @constraint(model, B - 1 - domain >= 0)
+        @constraint(model, B - 1 - domain >= 0, basis=ScaledMonomialBasis)
     end
 end
 
@@ -176,7 +176,7 @@ function sos_hpoly_lag(alg, model, x, region::AbstractHyperrectangle)
     dim_sets = rs.^2 - (x - cs).^2 # (x - cs).^2 <= rs.^2 <=> rs.^2 - (x - cs).^2 >= 0
 
     domain = sum(zip(x, dim_sets)) do (x_i, dim_set)
-        monos = monomials([x_i], 0:floor(Int64, alg.lagrange_degree / 2))
+        monos = ScaledMonomialBasis(monomials([x_i], 0:floor(Int64, alg.lagrange_degree / 2)))
 
         # Lagragian multiplier
         lag_poly = @variable(model, variable_type=SOSPoly(monos))
@@ -219,7 +219,7 @@ function sos_expectation_constraint!(alg, model, system, B, x, dyn_region, β)
     dyn_upper = dyn[2][1] * x + dyn[2][2]
     product_set = (dyn_upper - y) .* (y - dyn_lower)
 
-    monos_y = monomials(y, 0:floor(Int64, alg.lagrange_degree / 2))
+    monos_y = ScaledMonomialBasis(monomials(y, 0:floor(Int64, alg.lagrange_degree / 2)))
     dyn_domain = sum(product_set) do dim_set
         # Lagragian multiplier
         lag_poly = @variable(model, variable_type=SOSPoly(monos_y))
@@ -233,7 +233,7 @@ function sos_expectation_constraint!(alg, model, system, B, x, dyn_region, β)
     exp = expectation_noise(fx, σ_noise, z)
 
     # Add constraint
-    @constraint(model, -exp + B + β - exp_domain - dyn_domain >= 0)
+    @constraint(model, -exp + B + β - exp_domain - dyn_domain >= 0, basis=ScaledMonomialBasis)
 end
 
 # Function to compute the expecation and noise element
