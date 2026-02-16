@@ -31,7 +31,6 @@ yaml_files = [
     "benchmarks/linear/systems/room/SOS/sos_deg4.yaml",
     "benchmarks/linear/systems/room/SOS/sos_deg6.yaml",
     "benchmarks/linear/systems/room/SOS/sos_deg8.yaml",
-    "benchmarks/linear/systems/room/SOS/sos_deg12.yaml",
 
     "benchmarks/linear/systems/quadrotor/SOS/sos_deg2.yaml",
     "benchmarks/linear/systems/quadrotor/SOS/sos_deg4.yaml",
@@ -44,8 +43,6 @@ yaml_files = [
     "benchmarks/polynomial/systems/thermostat/SOS/sos_deg8.yaml",
     "benchmarks/polynomial/systems/thermostat/SOS/sos_deg12.yaml",
 
-    "benchmarks/polynomial/systems/oscillator/SOS/sos_deg2.yaml",
-    "benchmarks/polynomial/systems/oscillator/SOS/sos_deg4.yaml",
     "benchmarks/polynomial/systems/oscillator/SOS/sos_deg6.yaml",
     "benchmarks/polynomial/systems/oscillator/SOS/sos_deg8.yaml",
     "benchmarks/polynomial/systems/oscillator/SOS/sos_deg12.yaml"
