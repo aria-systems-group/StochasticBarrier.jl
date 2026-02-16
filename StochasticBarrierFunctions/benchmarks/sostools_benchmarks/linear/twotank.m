@@ -53,8 +53,10 @@ function [Bxpolys, betaval, gam, Ps] = runSOS2D(deg)
     prog = sosineq(prog, sig_o1);
     prog = sosineq(prog, B);
     
-    prog = sosineq(prog, B - sig_u1*(x1 - 1)*(9 - x1) - 1);
-    prog = sosineq(prog, B - sig_u2*(x2 - 1)*(9 - x2) - 1);
+    % unsafe set: outside of the box [1, 9]^2
+    x1c = 5; x1r = 4; x2c = 5; x2r = 4;
+    prog = sosineq(prog, B - sig_u1*((x1 - x1c)^2 - x1r^2) - 1);
+    prog = sosineq(prog, B - sig_u2*((x2 - x2c)^2 - x2r^2) - 1);
     
     prog = sosineq(prog, -B - sig_o1*(x1 - 2.75)*(3.25 - x1) + gamsym);
     prog = sosineq(prog, -B - sig_o2*(x2 - 2.75)*(3.25 - x2) + gamsym);
