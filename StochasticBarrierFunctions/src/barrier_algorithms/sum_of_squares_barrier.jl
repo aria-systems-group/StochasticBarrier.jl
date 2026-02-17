@@ -4,6 +4,7 @@ Base.@kwdef struct SumOfSquaresAlgorithm <: SumOfSquaresBarrierAlgorithm
     barrier_degree = 4
     lagrange_degree = 2
     sdp_solver = default_sdp_solver()
+    include_unsafe_set_constraint = true
 end
 
 struct SumOfSquaresAlgResult <: BarrierResult
@@ -30,13 +31,13 @@ function synthesize_barrier(alg::SumOfSquaresAlgorithm, system, initial_region::
 
         # Create barrier candidate
         @polyvar x[1:dimensionality(system)]
-        barrier_monomials = monomials(x, 0:floor(Int64, alg.barrier_degree / 2))
+        barrier_monomials = ScaledMonomialBasis(monomials(x, 0:floor(Int64, alg.barrier_degree / 2)))
 
         # Non-negative in ℝⁿ
         @variable(model, B, SOSPoly(barrier_monomials))
 
-        sos_initial_constraint!(model, B, x, η, initial_region)
-        sos_obstacle_constraint!(model, B, x, obstacle_region)
+        sos_initial_constraint!(alg, model, B, x, η, initial_region)
+        sos_obstacle_constraint!(alg, model, B, x, obstacle_region)
         sos_system_specific_constraints!(alg, model, B, x, β, system)
 
         # Define optimization objective
@@ -66,37 +67,39 @@ function check_hypercube_state_space(system)
     return state_space
 end
 
-sos_initial_constraint!(model, B, x, η, region::AbstractHyperrectangle) = sos_initial_constraint!(model, B, x, η, [region])
-sos_initial_constraint!(model, B, x, η, region::UnionSet{T, <:AbstractHyperrectangle, <:AbstractHyperrectangle}) where {T} = sos_initial_constraint!(model, B, x, η, [region.X, region.Y])
-sos_initial_constraint!(model, B, x, η, region::UnionSetArray{T, <:AbstractHyperrectangle}) where {T} = sos_initial_constraint!(model, B, x, η, region.array)
-function sos_initial_constraint!(model, B, x, η, regions::Vector{<:AbstractHyperrectangle})
+sos_initial_constraint!(alg, model, B, x, η, region::AbstractHyperrectangle) = sos_initial_constraint!(alg, model, B, x, η, [region])
+sos_initial_constraint!(alg, model, B, x, η, region::UnionSet{T, <:AbstractHyperrectangle, <:AbstractHyperrectangle}) where {T} = sos_initial_constraint!(alg, model, B, x, η, [region.X, region.Y])
+sos_initial_constraint!(alg, model, B, x, η, region::UnionSetArray{T, <:AbstractHyperrectangle}) where {T} = sos_initial_constraint!(alg, model, B, x, η, region.array)
+function sos_initial_constraint!(alg::SumOfSquaresAlgorithm ,model,B,x ,η ,regions::Vector{<:AbstractHyperrectangle})
     """ Barrier condition: initial
         * B(x) <= η
     """
     for region in regions
-        initial_domain = sos_hpoly_lag(model, x, region)
-        @constraint(model, -B + η - initial_domain >= 0)
+        initial_domain = sos_hpoly_lag(alg, model, x, region)
+        @constraint(model, -B + η - initial_domain >= 0, basis=ScaledMonomialBasis)
     end
 end
 
-sos_obstacle_constraint!(model, B, x, region::AbstractPolyhedron) = sos_obstacle_constraint!(model, B, x, [region])
-sos_obstacle_constraint!(model, B, x, region::EmptySet) = nothing
-sos_obstacle_constraint!(model, B, x, region::UnionSet{T, <:AbstractPolyhedron, <:AbstractPolyhedron}) where {T} = sos_obstacle_constraint!(model, B, x, [region.X, region.Y])
-sos_obstacle_constraint!(model, B, x, region::UnionSetArray{T, <:AbstractPolyhedron}) where {T} = sos_obstacle_constraint!(model, B, x, region.array)
-function sos_obstacle_constraint!(model, B, x, regions::Vector{<:AbstractPolyhedron})
+sos_obstacle_constraint!(alg, model, B, x, region::AbstractPolyhedron) = sos_obstacle_constraint!(alg, model, B, x, [region])
+sos_obstacle_constraint!(alg, model, B, x, region::EmptySet) = nothing
+sos_obstacle_constraint!(alg, model, B, x, region::UnionSet{T, <:AbstractPolyhedron, <:AbstractPolyhedron}) where {T} = sos_obstacle_constraint!(alg, model, B, x, [region.X, region.Y])
+sos_obstacle_constraint!(alg, model, B, x, region::UnionSetArray{T, <:AbstractPolyhedron}) where {T} = sos_obstacle_constraint!(alg, model, B, x, region.array)
+function sos_obstacle_constraint!(alg::SumOfSquaresAlgorithm ,model,B,x ,regions::Vector{<:AbstractPolyhedron})
     """ Barrier obstacle region conditions
         * B(x) >= 1
     """
     for region in regions
-        obstacle_domain = sos_hpoly_lag(model, x, region)
-        @constraint(model, B - 1 - obstacle_domain >= 0)
+        obstacle_domain = sos_hpoly_lag(alg, model, x, region)
+        @constraint(model, B - 1 - obstacle_domain >= 0, basis=ScaledMonomialBasis)
     end
 end
 
 function sos_system_specific_constraints!(alg, model, B, x, β, system::AdditiveGaussianUncertainPWASystem)
     # Unsafe set
     state_space = check_hypercube_state_space(system)
-    sos_unsafe_constraint!(alg, model, B, x, state_space)
+    if alg.include_unsafe_set_constraint
+        sos_unsafe_constraint!(alg, model, B, x, state_space)
+    end
 
     # Expectation constraint
     for dyn_region in dynamics(system)
@@ -106,7 +109,9 @@ end
 
 function sos_system_specific_constraints!(alg, model, B, x, β, system::AdditiveGaussianLinearSystem)
     # Unsafe set
-    sos_unsafe_constraint!(alg, model, B, x, system.state_space)
+    if alg.include_unsafe_set_constraint
+        sos_unsafe_constraint!(alg, model, B, x, system.state_space)
+    end
 
     # Expectation constraint
     @polyvar z[eachindex(x)]
@@ -117,15 +122,17 @@ function sos_system_specific_constraints!(alg, model, B, x, β, system::Additive
     σ_noise = noise_distribution(system)
     exp = expectation_noise(fx, σ_noise, z)
 
-    exp_domain = sos_hpoly_lag(model, x, system.state_space)
+    exp_domain = sos_hpoly_lag(alg, model, x, system.state_space)
 
     # Add constraint
-    @constraint(model, -exp + B + β - exp_domain >= 0)
+    @constraint(model, -exp + B + β - exp_domain >= 0, basis=ScaledMonomialBasis)
 end
 
 function sos_system_specific_constraints!(alg, model, B, x, β, system::AdditiveGaussianPolySystem)
     # Unsafe set
-    sos_unsafe_constraint!(alg, model, B, x, system.state_space)
+    if alg.include_unsafe_set_constraint
+        sos_unsafe_constraint!(alg, model, B, x, system.state_space)
+    end
 
     # Expectation constraint
     @polyvar z[eachindex(x)]
@@ -136,10 +143,10 @@ function sos_system_specific_constraints!(alg, model, B, x, β, system::Additive
     σ_noise = noise_distribution(system)
     exp = expectation_noise(fx, σ_noise, z)
 
-    exp_domain = sos_hpoly_lag(model, x, system.state_space)
+    exp_domain = sos_hpoly_lag(alg, model, x, system.state_space)
 
     # Add constraint
-    @constraint(model, -exp + B + β - exp_domain >= 0)
+    @constraint(model, -exp + B + β - exp_domain >= 0, basis=ScaledMonomialBasis)
 end
 
 function sos_unsafe_constraint!(alg, model, B, x, state_space::AbstractHyperrectangle)
@@ -147,24 +154,39 @@ function sos_unsafe_constraint!(alg, model, B, x, state_space::AbstractHyperrect
         * B(x) >= 1
     """
 
-    product_set_lower = low(state_space) - x
-    product_set_upper = x - high(state_space)
-    monos = monomials(x, 0:floor(Int64, alg.lagrange_degree / 2))
+    cs = center(state_space)
+    rs = radius_hyperrectangle(state_space)
+    dim_sets = (x - cs).^2 - rs.^2 # (x - cs).^2 >= rs.^2 <=> (x - cs).^2 - rs.^2 >= 0
 
-    for (dim_set_lower, dim_set_upper) in zip(product_set_lower, product_set_upper)
+    for (dim_set, x) in zip(dim_sets, x)
+        monos = ScaledMonomialBasis(monomials([x], 0:floor(Int64, alg.lagrange_degree / 2)))
+
         # Lagragian multiplier
-        lag_poly_lower = @variable(model, variable_type=SOSPoly(monos))
-        domain_lower = lag_poly_lower * dim_set_lower
+        lag_poly = @variable(model, variable_type=SOSPoly(monos))
+        domain = lag_poly * dim_set
 
-        lag_poly_upper = @variable(model, variable_type=SOSPoly(monos))
-        domain_upper = lag_poly_upper * dim_set_upper
-
-        @constraint(model, B - 1 - domain_lower >= 0)
-        @constraint(model, B - 1 - domain_upper >= 0)
+        @constraint(model, B - 1 - domain >= 0, basis=ScaledMonomialBasis)
     end
 end
 
-function sos_hpoly_lag(model, x, region)
+function sos_hpoly_lag(alg, model, x, region::AbstractHyperrectangle)
+    # Quadratic hyperrectangle encoding
+    cs = center(region)
+    rs = radius_hyperrectangle(region)
+    dim_sets = rs.^2 - (x - cs).^2 # (x - cs).^2 <= rs.^2 <=> rs.^2 - (x - cs).^2 >= 0
+
+    domain = sum(zip(x, dim_sets)) do (x_i, dim_set)
+        monos = ScaledMonomialBasis(monomials([x_i], 0:floor(Int64, alg.lagrange_degree / 2)))
+
+        # Lagragian multiplier
+        lag_poly = @variable(model, variable_type=SOSPoly(monos))
+        return lag_poly * dim_set
+    end
+
+    return domain
+end
+
+function sos_hpoly_lag(alg, model, x, region::AbstractPolyhedron)
     # Quadratic H-polytope encoding
     H, h = tosimplehrep(region)
     halfspace_constraints = H * x - h
@@ -190,14 +212,14 @@ function sos_expectation_constraint!(alg, model, system, B, x, dyn_region, β)
     X, dyn = dyn_region
     
     # Current state partition
-    exp_domain = sos_hpoly_lag(model, x, X)
+    exp_domain = sos_hpoly_lag(alg, model, x, X)
 
     # Compute dynamics domain
     dyn_lower = dyn[1][1] * x + dyn[1][2]
     dyn_upper = dyn[2][1] * x + dyn[2][2]
     product_set = (dyn_upper - y) .* (y - dyn_lower)
 
-    monos_y = monomials(y, 0:floor(Int64, alg.lagrange_degree / 2))
+    monos_y = ScaledMonomialBasis(monomials(y, 0:floor(Int64, alg.lagrange_degree / 2)))
     dyn_domain = sum(product_set) do dim_set
         # Lagragian multiplier
         lag_poly = @variable(model, variable_type=SOSPoly(monos_y))
@@ -211,7 +233,7 @@ function sos_expectation_constraint!(alg, model, system, B, x, dyn_region, β)
     exp = expectation_noise(fx, σ_noise, z)
 
     # Add constraint
-    @constraint(model, -exp + B + β - exp_domain - dyn_domain >= 0)
+    @constraint(model, -exp + B + β - exp_domain - dyn_domain >= 0, basis=ScaledMonomialBasis)
 end
 
 # Function to compute the expecation and noise element

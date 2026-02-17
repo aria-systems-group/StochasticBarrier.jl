@@ -30,7 +30,7 @@ function [Bxpolys, betaval, gam, Ps] = runSOS2D(deg)
     syms z1 z2 x1 x2 betasym gamsym real
     EXP = 0;
     
-    solver_opt.solver = 'sdpt3';
+    solver_opt.solver = 'mosek';
     fx = [0.95*x1; 0.95*x2];
     
     prog = sosprogram([x1, x2], [betasym, gamsym]);
@@ -51,8 +51,9 @@ function [Bxpolys, betaval, gam, Ps] = runSOS2D(deg)
     prog = sosineq(prog, sig_o1);
     prog = sosineq(prog, B);
     
-    prog = sosineq(prog, B - sig_u1*(x1 + 1)*(2 - x1) - 1);
-    prog = sosineq(prog, B - sig_u2*(x2 + 1)*(2 - x2) - 1);
+    x1c = 0.5; x1r = 1.5; x2c = 0.5; x2r = 1.5;
+    prog = sosineq(prog, B - sig_u1*((x1 - x1c)^2 - x1r^2) - 1); # unsafe set 1: (x1 - x1c)^2 >= x1r^2 (outside of the interval [x1c - x1r, x1c + x1r])
+    prog = sosineq(prog, B - sig_u2*((x2 - x2c)^2 - x2r^2) - 1); # unsafe set 2: (x2 - x2c)^2 >= x2r^2 (outside of the interval [x2c - x2r, x2c + x2r])
     
     prog = sosineq(prog, -B - sig_o1*(x1 + 0.05)*(-x1 + 0.05) + gamsym);
     prog = sosineq(prog, -B - sig_o2*(x2 + 0.05)*(-x2 + 0.05) + gamsym);
@@ -70,11 +71,11 @@ function [Bxpolys, betaval, gam, Ps] = runSOS2D(deg)
     termlist = children(Bsub);
     
     for ii = 1:length(termlist)
-    z1count = 0; z2count = 0; x1count = 0; x2count = 0; EXPz = 0;
-    factored = cell2sym(termlist(ii));
-    factoredterm = factor(factored);
+        z1count = 0; z2count = 0; x1count = 0; x2count = 0; EXPz = 0;
+        factored = cell2sym(termlist(ii));
+        factoredterm = factor(factored);
 
-    for jj = 1:length(factoredterm)
+        for jj = 1:length(factoredterm)
             if isequaln(factoredterm(jj), z1), z1count = z1count + 1; end
             if isequaln(factoredterm(jj), z2), z2count = z2count + 1; end
             if isequaln(factoredterm(jj), x1), x1count = x1count + 1; end

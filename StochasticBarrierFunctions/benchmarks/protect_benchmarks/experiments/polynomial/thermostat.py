@@ -20,7 +20,7 @@ if __name__ == '__main__':
     L_unsafe1 = np.array([1])
     U_unsafe1 = np.array([17])
 
-    # Unsafe set1
+    # Unsafe set2
     L_unsafe2 = np.array([23])
     U_unsafe2 = np.array([50])
 

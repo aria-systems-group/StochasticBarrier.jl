@@ -26,14 +26,44 @@ if __name__ == '__main__':
 
     # ------------------ Unsafe regions --------------------
     L_unsafe1 = np.array([-1.0, -2.0, -0.2, -0.2, -1.0, -1.0])
-    U_unsafe1 = np.array([-0.5, -1.0, -0.1, -0.1, -0.5, -0.5])
+    U_unsafe1 = np.array([-0.5, 2.0, 0.2, 0.2, 4.0, 2.0])
 
-    L_unsafe2 = np.array([2.0, 1.0, 0.1, 0.1, 3.0, 1.5])
+    L_unsafe2 = np.array([2.0, -2.0, -0.2, -0.2, -1.0, -1.0])
     U_unsafe2 = np.array([3.0, 2.0, 0.2, 0.2, 4.0, 2.0])
 
+    L_unsafe3 = np.array([-1.0, -2.0, -0.2, -0.2, -1.0, -1.0])
+    U_unsafe3 = np.array([3.0, -1.0, 0.2, 0.2, 4.0, 2.0])
+
+    L_unsafe4 = np.array([-1.0, 1.0, -0.2, -0.2, -1.0, -1.0])
+    U_unsafe4 = np.array([3.0, 2.0, 0.2, 0.2, 4.0, 2.0])
+
+    L_unsafe5 = np.array([-1.0, -2.0, -0.2, -0.2, -1.0, -1.0])
+    U_unsafe5 = np.array([3.0, 2.0, -0.1, 0.2, 4.0, 2.0])
+
+    L_unsafe6 = np.array([-1.0, -2.0, 0.1, -0.2, -1.0, -1.0])
+    U_unsafe6 = np.array([3.0, 2.0, 0.2, 0.2, 4.0, 2.0])
+
+    L_unsafe7 = np.array([-1.0, -2.0, -0.2, -0.2, -1.0, -1.0])
+    U_unsafe7 = np.array([3.0, 2.0, 0.2, -0.1, 4.0, 2.0])
+
+    L_unsafe8 = np.array([-1.0, -2.0, -0.2, 0.1, -1.0, -1.0])
+    U_unsafe8 = np.array([3.0, 2.0, 0.2, 0.2, 4.0, 2.0])
+
+    L_unsafe9 = np.array([-1.0, -2.0, -0.2, -0.2, -1.0, -1.0])
+    U_unsafe9 = np.array([3.0, 2.0, 0.2, 0.2, -0.5, 2.0])
+
+    L_unsafe10 = np.array([-1.0, -2.0, -0.2, -0.2, 3.0, -1.0])
+    U_unsafe10 = np.array([3.0, 2.0, 0.2, 0.2, 4.0, 2.0])
+
+    L_unsafe11 = np.array([-1.0, -2.0, -0.2, -0.2, -1.0, -0.5])
+    U_unsafe11 = np.array([3.0, 2.0, 0.2, 0.2, 4.0, 2.0])
+    
+    L_unsafe12 = np.array([-1.0, -2.0, -0.2, -0.2, -1.0, 1.5])
+    U_unsafe12 = np.array([3.0, 2.0, 0.2, 0.2, 4.0, 2.0])
+
     # Combine unsafe regions
-    L_unsafe = np.array([L_unsafe1, L_unsafe2])
-    U_unsafe = np.array([U_unsafe1, U_unsafe2])
+    L_unsafe = np.array([L_unsafe1, L_unsafe2, L_unsafe3, L_unsafe4, L_unsafe5, L_unsafe6, L_unsafe7, L_unsafe8, L_unsafe9, L_unsafe10, L_unsafe11, L_unsafe12])
+    U_unsafe = np.array([U_unsafe1, U_unsafe2, U_unsafe3, U_unsafe4, U_unsafe5, U_unsafe6, U_unsafe7, U_unsafe8, U_unsafe9, U_unsafe10, U_unsafe11, U_unsafe12])
 
     # ------------------ State space -----------------------
     L_space = np.array([-1.0, -2.0, -0.2, -0.2, -1.0, -1.0])

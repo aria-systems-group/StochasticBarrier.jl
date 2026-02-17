@@ -19,15 +19,23 @@ if __name__ == '__main__':
 
     # Unsafe set1
     L_unsafe1 = np.array([0, 0])
-    U_unsafe1 = np.array([1, 1])
+    U_unsafe1 = np.array([1, 10])
 
     # Unsafe set2
-    L_unsafe2 = np.array([9, 9])
-    U_unsafe2 = np.array([10, 10])
+    L_unsafe2 = np.array([0, 0])
+    U_unsafe2 = np.array([10, 1])
+
+    # Unsafe set3
+    L_unsafe3 = np.array([9, 0])
+    U_unsafe3 = np.array([10, 10])
+
+    # Unsafe set4
+    L_unsafe4 = np.array([0, 9])
+    U_unsafe4 = np.array([10, 10])
 
     # Combine unsafe regions
-    L_unsafe = np.array([L_unsafe1, L_unsafe2])
-    U_unsafe = np.array([U_unsafe1, U_unsafe2])
+    L_unsafe = np.array([L_unsafe1, L_unsafe2, L_unsafe3, L_unsafe4])
+    U_unsafe = np.array([U_unsafe1, U_unsafe2, U_unsafe3, U_unsafe4])
 
     # State space
     L_space = np.array([0, 0])

@@ -1,6 +1,7 @@
 using StochasticBarrierFunctions, StochasticBarrierFunctions.Data, LazySets
 using DynamicPolynomials
 using YAXArrays, NetCDF, YAML
+using Mosek, MosekTools
 
 abstract type SystemType end
     struct LINEAR <: SystemType end
@@ -140,7 +141,7 @@ function call_barrier_method(config, system_type_instance, barrier_type::SOS)
 
     # Optimize: baseline 1 (sos)
     barrier_degree, lagrange_degree, time_horizon = get_kwargs(config, barrier_type)
-    @time res_sos = synthesize_barrier(SumOfSquaresAlgorithm(barrier_degree=barrier_degree, lagrange_degree = lagrange_degree), 
+    @time res_sos = synthesize_barrier(SumOfSquaresAlgorithm(sdp_solver=Mosek.Optimizer, barrier_degree=barrier_degree, lagrange_degree = lagrange_degree), 
                                                              system, initial_region, obstacle_region; 
                                                              time_horizon=time_horizon)
 
@@ -246,7 +247,7 @@ end
 
 function get_kwargs(config, barrier_type::SOS)
     barrier_degree = get(config["barrier_settings"], "barrier_degree", SumOfSquaresAlgorithm().barrier_degree)
-    lagrange_degree = get(config["barrier_settings"], "lagrange_degree", SumOfSquaresAlgorithm().lagrange_degree) 
+    lagrange_degree = barrier_degree
     time_horizon = get(config["barrier_settings"], "time_horizon", 1) 
     return barrier_degree, lagrange_degree, time_horizon
 end

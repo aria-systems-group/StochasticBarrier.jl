@@ -1,7 +1,7 @@
 %% SOS 3D Polynomial System
 clc; clear all;
 
-deg_list = [2, 4, 6, 8, 12];
+deg_list = [2, 4, 6, 8];
 results = struct('degree', [], 'Bx', [], 'betaval', [], 'gam', [], 'Ps', [], 'time', []);
 
 for kk = 1:length(deg_list)
@@ -31,7 +31,7 @@ function [Bxpolys, betaval, gam, Ps] = runSOS3D(deg)
     syms z1 z2 z3 x1 x2 x3 betasym gamsym real
     EXP = 0;
     
-    solver_opt.solver = 'sdpt3';
+    solver_opt.solver = 'mosek';
     
     % System dynamics
     fx = [0.4 + 0.031*x2 + 0.929*x1;
@@ -61,9 +61,10 @@ function [Bxpolys, betaval, gam, Ps] = runSOS3D(deg)
     prog = sosineq(prog, B);
     
     % Unsafe set: x notin [17,29]^3
-    prog = sosineq(prog, B - sig_u1*(x1 - 17)*(29 - x1) - 1);
-    prog = sosineq(prog, B - sig_u2*(x2 - 17)*(29 - x2) - 1);
-    prog = sosineq(prog, B - sig_u3*(x3 - 17)*(29 - x3) - 1);
+    x1c = 23; x1r = 6; x2c = 23; x2r = 6; x3c = 23; x3r = 6;
+    prog = sosineq(prog, B - sig_u1*((x1 - x1c)^2 - x1r^2) - 1);
+    prog = sosineq(prog, B - sig_u2*((x2 - x2c)^2 - x2r^2) - 1);
+    prog = sosineq(prog, B - sig_u3*((x3 - x3c)^2 - x3r^2) - 1);
     
     % Initial region: x in [18,19]^3
     prog = sosineq(prog, -B - sig_o1*(x1 - 18)*(19 - x1) + gamsym);

@@ -1,13 +1,22 @@
 FROM julia:1.11.5
 
+# Install tools required by Mosek build
+RUN apt-get update && \
+    apt-get install -y tar bzip2 curl ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
 # --- StochasticBarrier.jl setup ---
 COPY ./StochasticBarrierFunctions /StochasticBarrierFunctions
 RUN chmod +x /StochasticBarrierFunctions/run_sos.bash \
     && chmod +x /StochasticBarrierFunctions/run_pwc.bash
 WORKDIR /StochasticBarrierFunctions
 
+# Mosek license path
+ENV MOSEKLM_LICENSE_FILE=/StochasticBarrierFunctions/benchmarks/mosek/mosek.lic
+
 # Precompile Julia package
-RUN julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate(); Pkg.precompile()'
+ENV JULIA_PROJECT='/StochasticBarrierFunctions/benchmarks'
+RUN julia --project="$JULIA_PROJECT" -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
 
 # Single alias that dispatches based on argument
 RUN echo 'stochasticbarrier() {' >> ~/.bashrc \
