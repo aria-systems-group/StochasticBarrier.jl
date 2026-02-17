@@ -52,8 +52,8 @@ function [Bxpolys, betaval, gam, Ps] = runSOS2D(deg)
     prog = sosineq(prog, B);
     
     x1c = 0.5; x1r = 1.5; x2c = 0.5; x2r = 1.5;
-    prog = sosineq(prog, B - sig_u1*((x1 - x1c)^2 - x1r^2) - 1); # unsafe set 1: (x1 - x1c)^2 >= x1r^2 (outside of the interval [x1c - x1r, x1c + x1r])
-    prog = sosineq(prog, B - sig_u2*((x2 - x2c)^2 - x2r^2) - 1); # unsafe set 2: (x2 - x2c)^2 >= x2r^2 (outside of the interval [x2c - x2r, x2c + x2r])
+    prog = sosineq(prog, B - sig_u1*((x1 - x1c)^2 - x1r^2) - 1); % unsafe set 1: (x1 - x1c)^2 >= x1r^2 (outside of the interval [x1c - x1r, x1c + x1r])
+    prog = sosineq(prog, B - sig_u2*((x2 - x2c)^2 - x2r^2) - 1); % unsafe set 2: (x2 - x2c)^2 >= x2r^2 (outside of the interval [x2c - x2r, x2c + x2r])
     
     prog = sosineq(prog, -B - sig_o1*(x1 + 0.05)*(-x1 + 0.05) + gamsym);
     prog = sosineq(prog, -B - sig_o2*(x2 + 0.05)*(-x2 + 0.05) + gamsym);
