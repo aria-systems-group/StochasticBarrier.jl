@@ -46,6 +46,10 @@ function synthesize_barrier(alg::SumOfSquaresAlgorithm, system, initial_region::
         # Optimize model
         optimize!(model)
 
+        if primal_status(model) != MOI.FEASIBLE_POINT
+            @warn "Optimization did not solve to optimality." solution_summary(model)
+        end
+
         # Barrier certificate
         B, η, β = MP.polynomial(value(B)), value(η), value(β)
     end
