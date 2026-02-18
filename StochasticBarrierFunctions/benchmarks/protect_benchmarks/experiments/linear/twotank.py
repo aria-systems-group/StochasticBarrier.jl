@@ -54,8 +54,8 @@ if __name__ == '__main__':
     mean = np.array([0, 0])
 
     # Dynamics
-    f1 = 0.90 * x[0] + 0.10 * x[1] + 0.45 + varsigma[0]
-    f2 = 0.90 * x[1] - 0.30 + varsigma[1]
+    f1 = 0.90 * x[0] + 0.45 + varsigma[0]
+    f2 = 0.10 * x[0] + 0.90 * x[1] - 0.30 + varsigma[1]
     f = np.array([f1, f2])
 
     # Time horizon
