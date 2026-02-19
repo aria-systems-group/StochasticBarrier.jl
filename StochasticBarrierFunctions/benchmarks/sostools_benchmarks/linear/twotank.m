@@ -1,7 +1,7 @@
 %% SOS Two Tank
 clc; clear all;
 
-deg_list = [4, 6, 8];
+deg_list = [4, 6, 8, 10];
 results = struct('degree', [], 'Bx', [], 'betaval', [], 'gam', [], 'Ps', [], 'time', []);
 
 for kk = 1:length(deg_list)
