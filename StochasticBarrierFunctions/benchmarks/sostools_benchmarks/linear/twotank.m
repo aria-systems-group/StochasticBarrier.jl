@@ -32,7 +32,7 @@ function [Bxpolys, betaval, gam, Ps] = runSOS2D(deg)
     EXP = 0;
     
     solver_opt.solver = 'mosek';
-    fx = [0.90*x1 + 0.1*x2 + 0.45; 0.90*x2 - 0.3];
+    fx = [0.90*x1 + 0.45; 0.1*x1 + 0.90*x2 - 0.3];
     
     prog = sosprogram([x1, x2], [betasym, gamsym]);
     Zmon = monomials([x1, x2], 0:deg);

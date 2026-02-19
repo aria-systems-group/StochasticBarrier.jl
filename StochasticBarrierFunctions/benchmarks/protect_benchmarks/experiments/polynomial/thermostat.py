@@ -36,14 +36,7 @@ if __name__ == '__main__':
     x = sp.symbols(f'x0:{dim}')  # Create x1, x2, ..., x_degree symbols
     varsigma = sp.symbols(f'varsigma0:{dim}')
     # ========================= Dynamics =========================
-    beta = 0.6
-    theta = 0.145
-    Te = -15
-    Th = 45
-    R = 0.1
-
-    nu = -0.0120155 * x[0] + 0.8
-    f1 = (1 - beta - theta * nu) * x[0] + theta * Th * nu + beta * Te + R * varsigma[0]
+    f1 = 4.32 + 0.7455988625*x[0] + 0.0017422474999999999*x[0]**2 + varsigma[0]
 
     # Define the vector field
     f = np.array([f1])
