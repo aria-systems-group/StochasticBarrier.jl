@@ -1,7 +1,7 @@
 %% SOS 3D Polynomial System
 clc; clear all;
 
-deg_list = [2, 4, 6, 8];
+deg_list = [6, 8];
 results = struct('degree', [], 'Bx', [], 'betaval', [], 'gam', [], 'Ps', [], 'time', []);
 
 for kk = 1:length(deg_list)
@@ -25,7 +25,7 @@ end
 
 %% Function definition
 function [Bxpolys, betaval, gam, Ps] = runSOS3D(deg)
-    alpha = 1; gx = 0.1; N = 10; x0 = [18;18;18];
+    alpha = 1; gx = 0.1; N = 10; x0 = [21.5;21.5;21.5];
     
     % Symbols
     syms z1 z2 z3 x1 x2 x3 betasym gamsym real
