@@ -78,7 +78,7 @@ if __name__ == '__main__':
         'solver': "mosek",
         'confidence': None,
         'gam': None,
-        'lam': 1000,
+        'lam': 10,
         'c_val': None,
         'sigma': sigma,
         'mean' : mean,
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     }
 
     # ------------------ Run for multiple degrees -----------------
-    degrees = [6, 8, 12]
+    degrees = [8, 12, 14]
 
     for degree in degrees:
         start = time.time()
